@@ -87,7 +87,9 @@ export class NutritionistController {
             return this.handleError(error, status)
         }
     }
-    async deleteNutritionist({ params, status }: Context<{ params: typeof NutritionistSchema.identifySchema }>) {
+    async deleteNutritionist({ params, status }: Context<{
+        params: typeof NutritionistSchema.identifySchema.static
+    }>) {
         try {
             await this.prisma.nutritionist.delete({
                 where: {
