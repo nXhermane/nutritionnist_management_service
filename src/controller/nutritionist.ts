@@ -59,7 +59,7 @@ export class NutritionistController {
                 }
             })
             if (nutritionistWithSpecialization === null) {
-                 return status("Not Found", { error: `Nutritionist with id ${params.id} not found.` })
+                return status("Not Found", { error: `Nutritionist with id ${params.id} not found.` })
             }
             return status("OK", nutritionistWithSpecialization)
         } catch (error) {
@@ -89,12 +89,20 @@ export class NutritionistController {
     }
     async deleteNutritionist({ params, status }: Context<{ params: typeof NutritionistSchema.identifySchema }>) {
         try {
-           await this.prisma.nutritionist.delete({
+            await this.prisma.nutritionist.delete({
                 where: {
                     id: params.id
                 }
             })
-            return status ("OK",{message: "Nutritionsit is sucessful delete."})
+            return status("OK", { message: "Nutritionsit is sucessful delete." })
+        } catch (error) {
+            return this.handleError(error, status)
+        }
+    }
+    async getAllSpecialization({ status }: Context) {
+        try {
+            const specializations = await this.prisma.specialization.findMany()
+            return status("OK", specializations)
         } catch (error) {
             return this.handleError(error, status)
         }
