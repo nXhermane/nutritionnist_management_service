@@ -5,6 +5,7 @@ export const NutritionistSchema = {
         lastName: t.String({ format: "string", minLength: 2, error: "Last name is required and must be at least 2 characters long" }),
         email: t.String({ format: "email", error: "A valid email address is required" }),
         phoneNumber: t.Optional(t.String({ format: "string", minLength: 10, error: "Phone number must be at least 7 characters long" })),
+        address: t.Optional(t.String({ format: 'string', minLength: 5, error: '' })),
         specializationIds: t.Optional(t.Array(t.String({ format: "uuid" }))),
         specializations: t.Optional(t.Array(t.Object({
             title: t.String({ format: "string", minLength: 2, error: "Title is required and must be at least 2 characters long" }),
