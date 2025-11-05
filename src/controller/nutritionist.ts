@@ -28,7 +28,7 @@ export class NutritionistController {
             return status("Created", nutritonist)
         } catch (error: any) {
             if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
-                return status(409, { error: error.message });
+                return status(409, { error: "Email already in use." })
             }
             return this.handleError(error, status)
         }
@@ -96,7 +96,7 @@ export class NutritionistController {
                     id: params.id
                 }
             })
-            return status("OK", { message: "Nutritionsit is sucessful delete." })
+            return status("OK", { message: "Nutritionist deleted successfully." })
         } catch (error) {
             return this.handleError(error, status)
         }
