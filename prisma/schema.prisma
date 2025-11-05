@@ -13,7 +13,7 @@ model Nutritionist {
   firstName       String
   lastName        String
   email           String           @unique
-  telephone       String?
+  phoneNumber     String?
   address         String?
   specializations Specialization[] @relation("NutritionistSpecializations")
   createdAt       DateTime         @default(now())
