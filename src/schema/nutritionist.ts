@@ -20,5 +20,8 @@ export const NutritionistSchema = {
     }),
     identifySchema: t.Object({
         id: t.String({ format: "uuid", error: "A valid UUID is required for id" })
-    })
+    }),
+    specializationSchema: t.Object({
+        specializationId: t.String({ format: "uuid", error: "A valid UUID is required for specializationId" })
+    }),
 }

@@ -57,6 +57,24 @@ export class SpecializationController {
         }
     }
     
+    async getNutritionistsOfSpecialization({ params, status }: Context<{ params: typeof SpecializationSchema.identifySchema.static }>) {
+        try {
+            const nutritionists = await this.prisma.nutritionistSpecialization.findMany({
+                where: { specializationId: params.id },
+                select: {
+                    nutritionist: true
+                }
+            });
+            return status("OK", {
+                id: params.id,
+                nutritionists: nutritionists
+            });
+        } catch (error) {
+            this.handleError(error, status);
+        }
+    }
+   
+
     private handleError(error: any, status: Context["status"]) {
         console.error(error);
         return status(500, { error: "Internal Server Error" });

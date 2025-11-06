@@ -78,6 +78,57 @@ export class NutritionistController {
         }
     }
 
+    async asignSpecializationToNutritionist({ body, params, status }: Context<{ params: typeof NutritionistSchema.identifySchema.static, body: typeof NutritionistSchema.specializationSchema.static }>) {
+        try {
+            const assignment = await this.prisma.nutritionistSpecialization.create({
+                data: {
+                    nutritionistId: params.id,
+                    specializationId: body.specializationId
+                }
+            });
+            return status("OK", {
+                message: "Specialization assigned to Nutritionist successfully.",
+            });
+        } catch (error) {
+            this.handleError(error, status);
+        }
+    }
+    async removeSpecializationFromNutritionist({ body, params, status }: Context<{ params: typeof NutritionistSchema.identifySchema.static, body: typeof NutritionistSchema.specializationSchema.static }>) {
+        try {
+            const deletion = await this.prisma.nutritionistSpecialization.deleteMany({
+                where: {
+                    nutritionistId: params.id,
+                    specializationId: body.specializationId
+                }
+            });
+            return status("OK", {
+                message: "Specialization removed from Nutritionist successfully.",
+            });
+        } catch (error) {
+            this.handleError(error, status);
+        }
+    }
+
+
+     async getSpecializationsOfNutritionist({ params, status }: Context<{ params: typeof NutritionistSchema.identifySchema.static }>) {
+        try {
+            const specializations = await this.prisma.nutritionistSpecialization.findMany({
+                where: {
+                    nutritionistId: params.id
+                },
+                select: { specialization: true }
+            });
+            return status("OK", {
+                id: params.id,
+                specializations: specializations
+            })
+        } catch (error) {
+            this.handleError(error, status);
+        }
+    }
+
+
+
     private handleError(error: any, status: Context['status']) {
         return status(500, { error: error['message'] || JSON.stringify(error) })
     }

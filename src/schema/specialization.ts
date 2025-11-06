@@ -11,5 +11,5 @@ export const SpecializationSchema = {
     }),
     identifySchema: t.Object({
         id: t.String({ format: "uuid", error: "A valid UUID is required for id" })
-    })
+    }),
 }

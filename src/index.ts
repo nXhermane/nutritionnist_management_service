@@ -1,13 +1,14 @@
 import { Elysia } from "elysia";
-import { NutritionistController, NutritionistSpecializationController, SpecializationController } from "./controller";
-import { NutritionistSchema, NutritionistSpecializationSchema, SpecializationSchema } from "./schema";
+import { NutritionistController, SpecializationController } from "./controller";
+import { NutritionistSchema, SpecializationSchema } from "./schema";
 import { PrismaClient } from "./generated/prisma/client";
+
+
 function bootstrap() {
 
   const prisma = new PrismaClient()
   const nutritionistController = new NutritionistController(prisma);
   const specializationController = new SpecializationController(prisma);
-  const nutritionistSpecializationController = new NutritionistSpecializationController(prisma);
 
   const nutritionistRoute = new Elysia({ prefix: "/nutritionists" })
     .get("/", (context) => nutritionistController.getAllNutritionists(context))
@@ -24,8 +25,17 @@ function bootstrap() {
     .delete("/:id", context => nutritionistController.deleteNutritionist(context), {
       params: NutritionistSchema.identifySchema
     })
-
-
+    .post("/:id/specialization", context => nutritionistController.asignSpecializationToNutritionist(context), {
+      params: NutritionistSchema.identifySchema,
+      body: NutritionistSchema.specializationSchema
+    })
+    .delete("/:id/specialization", context => nutritionistController.removeSpecializationFromNutritionist(context), {
+      params: NutritionistSchema.identifySchema,
+      body: NutritionistSchema.specializationSchema
+    })
+    .get("/:id/specializations", context => nutritionistController.getSpecializationsOfNutritionist(context), {
+      params: NutritionistSchema.identifySchema
+    })
 
   const specializationRoute = new Elysia({ prefix: "/specializations" })
     .get("/", (context) => specializationController.getAllSpecializations(context))
@@ -39,27 +49,13 @@ function bootstrap() {
     .get("/:id", (context) => specializationController.getSpecialization(context), {
       params: SpecializationSchema.identifySchema
     })
-
-
-
-  const nutritionistSpecializationRoute = new Elysia({ prefix: "/nutritionist-specializations" })
-    .post("/", (context) => nutritionistSpecializationController.asignSpecializationToNutritionist(context), {
-      body: NutritionistSpecializationSchema.specializationSchema
-    })
-    .delete("/", (context) => nutritionistSpecializationController.removeSpecializationFromNutritionist(context), {
-      body: NutritionistSpecializationSchema.specializationSchema
-    })
-    .get("/nutritionist/:nutritionistId", (context) => nutritionistSpecializationController.getSpecializationsForNutritionist(context), {
-      params: NutritionistSpecializationSchema.identifyNutritionistSchema
-    })
-    .get("/specialization/:specializationId", (context) => nutritionistSpecializationController.getNutritionistsForSpecialization(context), {
-      params: NutritionistSpecializationSchema.identifySpecializationSchema
+    .get("/:id/nutritionists", (context) => specializationController.getNutritionistsOfSpecialization(context), {
+      params: SpecializationSchema.identifySchema
     })
 
   const app = new Elysia()
     .use(nutritionistRoute)
     .use(specializationRoute)
-    .use(nutritionistSpecializationRoute)
     .listen(3000);
 
   console.log(
