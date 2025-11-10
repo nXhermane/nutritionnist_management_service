@@ -1,25 +1,27 @@
-import { Elysia } from "elysia";
-import { specializationSchema } from "./schema";
-import { ISpecializationController } from "./controller";
+import { Elysia, t } from "elysia";
+import * as SpecializationController from './controller';
+import { createSpecializationSchema, getNutritionistBySpecializationResponse, getSpecializationResponse, getSpecializationSchema, updateSpecializationSchema } from "./dtos";
 
-
-export function createSpecializationRoute(controller: ISpecializationController) {
- return new Elysia({ prefix: "/specializations" })
-  .get("/", (context) => controller.getAll(context))
-  .post("/", (context) => controller.create(context), {
-    body: specializationSchema.create,
+export const specializationRoute = new Elysia({ prefix: "/specializations" })
+  .get("/", ({ }) => SpecializationController.getAllSpecializations(), { response: t.Array(getSpecializationResponse) })
+  .post("/", ({ body }) => SpecializationController.createSpecialization(body), {
+    body: createSpecializationSchema,
+    response: getSpecializationSchema
   })
-  .put("/:id", (context) => controller.update(context), {
-    params: specializationSchema.params,
-    body: specializationSchema.update,
+  .put("/:id", ({ params, body }) => SpecializationController.updateSpecialization(params, body), {
+    params: getSpecializationSchema,
+    body: updateSpecializationSchema,
+    response: t.Void()
   })
-  .get("/:id", (context) => controller.getById(context), {
-    params: specializationSchema.params,
+  .get("/:id", ({ params }) => SpecializationController.getSpecializationById(params), {
+    params: getSpecializationSchema,
+    response: getSpecializationResponse
   })
-  .get("/:id/nutritionists", (context) => controller.getNutritionists(context), {
-    params: specializationSchema.params,
+  .get("/:id/nutritionists", ({ params }) => SpecializationController.getNutritionistBySpecialization(params), {
+    params: getSpecializationSchema,
+    response: getNutritionistBySpecializationResponse
   })
-  .delete("/:id", (context) => controller.delete(context), {
-    params: specializationSchema.params,
+  .delete("/:id", ({ params }) => SpecializationController.deleteSpecialization(params), {
+    params: getSpecializationSchema,
+    response: t.Void()
   });
-}

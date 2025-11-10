@@ -1,46 +1,49 @@
-import { Elysia } from "elysia";
-import { INutritionistController } from "./controller";
-import { nutritionistSchema } from "./schema";
+import { Elysia, t } from "elysia";
+import * as NutritionistController from "./controller";
+import { createNutritionistSchema, getNutritionistParams as createNutritionistResponse, nutritionistResponse, getNutritionistParams, updateNutritionistSchema, nutritionistSpecializationSchema, getNutritionistSpecializationResponse } from "./dtos";
 
 
-export function createNutritionistRoute(controller: INutritionistController) {
-  return new Elysia({ prefix: "/nutritionists" })
-    .get("/", (context) => controller.getAll(context))
-    .post("/", (context) => controller.create(context), {
-      body: nutritionistSchema.create,
-    })
-    .get("/:id", (context) => controller.getById(context), {
-      params: nutritionistSchema.params,
-    })
-    .put("/:id", (context) => controller.update(context), {
-      params: nutritionistSchema.params,
-      body: nutritionistSchema.update,
-    })
-    .delete("/:id", (context) => controller.delete(context), {
-      params: nutritionistSchema.params,
-    })
-    .post(
-      "/:id/specialization",
-      (context) => controller.assignSpecialization(context),
-      {
-        params: nutritionistSchema.params,
-        body: nutritionistSchema.specialization,
-      }
-    )
-    .delete(
-      "/:id/specialization",
-      (context) => controller.removeSpecialization(context),
-      {
-        params: nutritionistSchema.params,
-        body: nutritionistSchema.specialization,
-      }
-    )
-    .get(
-      "/:id/specializations",
-      (context) => controller.getSpecializations(context),
-      {
-        params: nutritionistSchema.params,
-      }
-    );
-
-}
+export const nutritionistRoute = new Elysia({ prefix: "/nutritionists" })
+  .get("/", () => NutritionistController.getAllNutritionists(), { response: t.Array(nutritionistResponse) })
+  .post("/", ({ body }) => NutritionistController.createNutritionist(body), {
+    body: createNutritionistSchema,
+    response: createNutritionistResponse
+  })
+  .get("/:id", ({ params }) => NutritionistController.getNutritionistById(params), {
+    params: getNutritionistParams,
+    response: nutritionistResponse
+  })
+  .put("/:id", ({ params, body }) => NutritionistController.updateNutritionist(params, body), {
+    params: getNutritionistParams,
+    body: updateNutritionistSchema,
+    response: t.Void()
+  })
+  .delete("/:id", ({ params }) => NutritionistController.deleteNutritionist(params), {
+    params: getNutritionistParams,
+  })
+  .post(
+    "/:id/specialization",
+    ({ params, body }) => NutritionistController.assignSpecializationToNutritionist(params, body),
+    {
+      params: getNutritionistParams,
+      body: nutritionistSpecializationSchema,
+      response: t.Void()
+    }
+  )
+  .delete(
+    "/:id/specialization",
+    ({ params, body }) => NutritionistController.removeNutritionistSpecialization(params, body),
+    {
+      params: getNutritionistParams,
+      body: nutritionistSpecializationSchema,
+      response: t.Void()
+    }
+  )
+  .get(
+    "/:id/specializations",
+    ({ params }) => NutritionistController.getNutritionistSpecialization(params),
+    {
+      params: getNutritionistParams,
+      response: getNutritionistSpecializationResponse
+    }
+  );
