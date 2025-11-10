@@ -1,16 +1,18 @@
 import { Elysia } from "elysia";
-import { createNutritionistRoute } from "./nutritionist";
-import { NutritionistController } from "./nutritionist/controller";
-import { NutritionistService } from "./nutritionist/service";
-import { createSpecializationRoute } from "./specialization";
-import { SpecializationController } from "./specialization/controller";
-import { SpecializationService } from "./specialization/service";
+import { nutritionistRoute } from "./nutritionist";
+import { specializationRoute } from "./specialization";
+import { handleError } from "./lib/errors";
+
 
 
 function bootstrap() {
   const app = new Elysia()
-    .use(createNutritionistRoute(new NutritionistController(new NutritionistService())))
-    .use(createSpecializationRoute(new SpecializationController(new SpecializationService())))
+    .onError(({ error, status }) => {
+      const handled = handleError(error)
+      return status(handled.code, { error: handled.error })
+    })
+    .use(nutritionistRoute)
+    .use(specializationRoute)
     .listen(3000);
   console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 }
